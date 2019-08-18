@@ -16,6 +16,15 @@ public class CameraController : MonoBehaviour
     [SerializeField]
     private float rotate_speed = 1.0f;
 
+    //マウスホイールの入力状態を保存
+    private float scroll;
+    //カメラのズーム速度
+    [SerializeField]
+    private float scrollSpeed=5;
+    [SerializeField]
+    private const float CanZoomMax = 20;
+    [SerializeField]
+    private const float CanZoomMin = 4;
 
 
     void Awake()
@@ -26,6 +35,16 @@ public class CameraController : MonoBehaviour
 
     void Update()
     {
+        scroll=Input.GetAxis("Mouse ScrollWheel");
+        Vector3 beforeCameraPos= mainCamera.transform.position;
+
+        mainCamera.transform.position += transform.forward * scroll * scrollSpeed;
+        float dis = Vector3.Distance(player.transform.position,mainCamera.transform.position);
+        if(dis<= CanZoomMin || dis>= CanZoomMax)
+        {
+            mainCamera.transform.position = beforeCameraPos;
+        }
+
         //ターゲットの座標を追従
         transform.position = player.transform.position;
 
