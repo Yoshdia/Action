@@ -12,7 +12,7 @@ public class MoveController : MonoBehaviour
     Vector3 inputMovement;
 
     [SerializeField]
-    float moveSpeed = 1;
+    float moveSpeed = 10;
 
     void Awake()
     {
@@ -52,7 +52,15 @@ public class MoveController : MonoBehaviour
         }
         else
         {
-            animator.SetBool("Walk", true);
+            animator.SetBool("Walk", false);
         }
+    }
+
+    public void FootR()
+    {
+    }
+
+    public void FootL()
+    {
     }
 }

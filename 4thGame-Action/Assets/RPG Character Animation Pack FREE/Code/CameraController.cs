@@ -16,6 +16,8 @@ public class CameraController : MonoBehaviour
     [SerializeField]
     private float rotate_speed = 1.0f;
 
+
+
     void Awake()
     {
         mainCamera = Camera.main.gameObject;
