@@ -2,58 +2,45 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DangerZoneAtacck : MonoBehaviour
+public class DangerZoneBasic : MonoBehaviour
 {
     /// <summary>
     /// 予兆が発生してから消え始めるまでの時間
     /// </summary>
     [SerializeField]
-    private float waitingInterval = 100;
+    protected private float waitingInterval = 100;
+
     /// <summary>
     /// a値が減少する速度
     /// </summary>
     [SerializeField]
-    float alfaSpeed = 0.01f;
-    float alfa = 1;
+    protected float alfaSpeed = 0.01f;
+    protected float alfa = 1;
 
-    bool deletedDangerZone;
+    protected bool deletedDangerZone;
 
     // Start is called before the first frame update
-    void Start()
+    protected virtual void Start()
     {
         deletedDangerZone = false;
         alfa = GetComponent<Renderer>().material.color.a;
-        waitingInterval = SkeltonController.SphereSkillDangerTime;
+        waitingInterval = SphereSkill.dangerTime;
     }
 
     // Update is called once per frame
-    void Update()
+    protected virtual void Update()
     {
         DeleatingZone();
         if (deletedDangerZone)
         {
             //予兆の表示が終了したらタグを変更し1f後に削除される
             this.tag = "AttackingZone";
-            Destroy(this.gameObject,1f);
+            Destroy(this.gameObject, 0.1f);
         }
     }
 
-    void DeleatingZone()
+    protected virtual void DeleatingZone()
     {
-        if (waitingInterval < 0)
-        {
-            alfa -= alfaSpeed;
-            if (alfa < 0)
-            {
-                deletedDangerZone = true;
-                return;
-            }
-            GetComponent<Renderer>().material.color = new Color(255, 0, 0, alfa);
-        }
-        else
-        {
-            waitingInterval--;
-        }
+        Debug.Log("Didn't write danger's function!");
     }
-
 }

@@ -2,16 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SkeltonController : MonoBehaviour
+public class SkeltonController : EnemyBasic
 {
-    Animator animator;
-
-    enum SkelltonState
+    enum SkeltonState
     {
         AutoAttacking,
         SkillChaging,
     }
-    SkelltonState myState;
+    SkeltonState myState;
+
+    enum SkeltonSkill
+    {
+        SphereExplosion,
+        Search,
+    }
+    SkeltonSkill skill;
 
     /// <summary>
     /// 移動を停止する距離
@@ -30,33 +35,19 @@ public class SkeltonController : MonoBehaviour
     [SerializeField]
     float moveSpeedMax = 0.1f;
 
-    public MoveController target;
-
-    float attackInterval;
-    [SerializeField]
-     float attackIntervalMax = 100;
-
-    [SerializeField]
-     float autoAttackDamage = 1;
+    private EnemySkillBasic sphereSkill;
+    private EnemySkillBasic searchSkill;
 
     /// <summary>
-    /// スキルプレハブ
+    /// スキルチャージ中にSkeltonを中心に発生するエフェクト
     /// </summary>
     [SerializeField]
-    GameObject skillPrehub;
+    GameObject sphereSkillEffect;
 
     /// <summary>
-    /// スキルチャージ中に発生するエフェクト
+    /// チャージ終了後のエフェクトを変更、削除するために格納しておく変数
     /// </summary>
-    [SerializeField]
-    GameObject skillEffect;
-
     GameObject instantSkillEffect;
-
-    /// <summary>
-    /// スキル１の予兆が表示される時間
-    /// </summary>
-    public const float SphereSkillDangerTime = 200;
 
     /// <summary>
     /// 動的に変化する、予兆発生からモーション再生までのインターバル
@@ -68,29 +59,31 @@ public class SkeltonController : MonoBehaviour
     /// </summary>
     bool skillPlaced;
 
-    private void Awake()
+    protected override void Awake()
     {
-        animator = GetComponent<Animator>();
+        base.Awake();
     }
 
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
+        base.Start();
         instantSkillEffect = null;
-        myState = SkelltonState.SkillChaging;
-        attackInterval = attackIntervalMax;
+        myState = SkeltonState.SkillChaging;
+        skill = SkeltonSkill.Search;
+        sphereSkill = GetComponent<SphereSkill>();
+        searchSkill = GetComponent<SearchDanger>();
     }
 
     // Update is called once per frame
-    void Update()
+    protected override void Update()
     {
-        attackInterval--;
+        base.Update();
     }
-
 
     private void FixedUpdate()
     {
-        if (myState == SkelltonState.AutoAttacking)
+        if (myState == SkeltonState.AutoAttacking)
         {
             Move();
         }
@@ -107,12 +100,14 @@ public class SkeltonController : MonoBehaviour
         {
             moveSpeed = moveSpeedMax;
         }
-        Vector3 targetPosition = target.GetPosition();
+        Vector3 targetPosition = target.GetTransform().position;
         float distance = Vector3.Distance(targetPosition, transform.position);
         if (distance > movingDistance)
         {
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetPosition - transform.position), 0.3f);
-            transform.position += transform.forward * moveSpeed;
+            Vector3 targetForword = transform.forward;
+            targetForword.y = 0;
+            transform.position += targetForword * moveSpeed;
             animator.SetBool("Walk", true);
         }
         else
@@ -123,25 +118,15 @@ public class SkeltonController : MonoBehaviour
         }
     }
 
-    void Attack()
-    {
-        if (attackInterval < 0)
-        {
-            attackInterval = attackIntervalMax;
-            animator.SetBool("Attack", true);
-            target.AddDamage(autoAttackDamage);
-            Debug.Log("attacked!");
-        }
-    }
-
     void SkillPlace()
     {
         if (skillPlaced)
         {
-            if(skillDangerTime<0)
+            if (skillDangerTime < 0)
             {
                 animator.SetBool("Skill", true);
-                myState = SkelltonState.AutoAttacking;
+                animator.SetBool("SkillChaging", false);
+                myState = SkeltonState.AutoAttacking;
                 Destroy(instantSkillEffect.gameObject);
                 instantSkillEffect = null;
             }
@@ -152,21 +137,37 @@ public class SkeltonController : MonoBehaviour
         }
         else
         {
+            animator.SetBool("SkillChaging", true);
             skillPlaced = true;
-            skillDangerTime = SphereSkillDangerTime;
-            GameObject skill = Instantiate(skillPrehub, transform.position, new Quaternion());
-            skill.transform.parent = transform.parent;
+            skillDangerTime = SphereSkill.dangerTime;
             Quaternion effectQua = new Quaternion();
             effectQua = Quaternion.Euler(new Vector3(-90, 0, 0));
-            instantSkillEffect= Instantiate(skillEffect, transform.position, effectQua);
-            instantSkillEffect.transform.parent = transform.parent;
+            instantSkillEffect = Instantiate(sphereSkillEffect, transform.position, effectQua);
+            instantSkillEffect.transform.parent = transform;
+
+            EnemySkillBasic ShotSkill = null;
+            Transform trans = transform;
+            switch (skill)
+            {
+                case (SkeltonSkill.SphereExplosion):
+                    ShotSkill = sphereSkill;
+                    break;
+                case (SkeltonSkill.Search):
+                    ShotSkill = searchSkill;
+                    trans = target.GetTransform();
+                    break;
+                default:
+                    ShotSkill = sphereSkill;
+                    break;
+            }
+
+            ShotSkill.SetSkillPrehub(trans);
         }
     }
 
-
-    private void LateUpdate()
+    protected override void LateUpdate()
     {
-        animator.SetBool("Attack", false);
+        base.LateUpdate();
         animator.SetBool("Skill", false);
     }
 }

@@ -223,9 +223,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 448b8ceaaeee1f545ae722ac340bfc84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  attackIntervalMax: 200
+  autoAttackDamage: 1
   movingDistance: 4
   moveSpeedMax: 0.2
-  target: {fileID: 0}
+  sphereSkillEffect: {fileID: 8330201032652980630, guid: 1016ec02820cb89458c30bbbbd1dd470,
+    type: 3}
 --- !u!1 &8595665031381261082
 GameObject:
   m_ObjectHideFlags: 0

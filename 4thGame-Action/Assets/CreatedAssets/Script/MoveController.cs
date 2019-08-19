@@ -200,9 +200,9 @@ public class MoveController : MonoBehaviour
         }
     }
 
-    public Vector3 GetPosition()
+    public Transform GetTransform()
     {
-        return transform.position;
+        return transform;
     }
 
     public void AddDamage(float damage)
