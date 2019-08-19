@@ -36,11 +36,11 @@ public class SphereDangerZone : DangerZoneBasic
                 {
                     effectSet = true;
                     Vector3 fall = transform.position;
-                    fall.y += 20;
                     Quaternion fallQ = new Quaternion();
+                    Instantiate(explosionEffect,fall,fallQ);
+                    fall.y += 20;
                     fallQ = Quaternion.Euler(90, 0, 0);
                     Instantiate(fallEffect,fall,fallQ);
-                    Instantiate(explosionEffect);
                 }
                 return;
             }
