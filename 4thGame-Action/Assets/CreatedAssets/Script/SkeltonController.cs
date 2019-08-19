@@ -69,7 +69,7 @@ public class SkeltonController : EnemyBasic
     {
         base.Start();
         instantSkillEffect = null;
-        myState = SkeltonState.SkillChaging;
+        myState = SkeltonState.AutoAttacking;
         skill = SkeltonSkill.Search;
         sphereSkill = GetComponent<SphereSkill>();
         searchSkill = GetComponent<SearchDanger>();
@@ -115,6 +115,7 @@ public class SkeltonController : EnemyBasic
             moveSpeed = 0;
             animator.SetBool("Walk", false);
             Attack();
+            //myState = SkeltonState.SkillChaging;
         }
     }
 
@@ -129,6 +130,7 @@ public class SkeltonController : EnemyBasic
                 myState = SkeltonState.AutoAttacking;
                 Destroy(instantSkillEffect.gameObject);
                 instantSkillEffect = null;
+                skillPlaced = false;
             }
             else
             {

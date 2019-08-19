@@ -23,6 +23,8 @@ public class SearchDanger : EnemySkillBasic
 
     public override void SetSkillPrehub(Transform parent)
     {
-        GameObject skill = Instantiate(skillPrehub, parent.position, new Quaternion());
+        Vector3 parentPos = parent.position;
+        parentPos.y = 0;
+        GameObject skill = Instantiate(skillPrehub, parentPos, new Quaternion());
     }
 }
