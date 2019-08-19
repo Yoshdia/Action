@@ -9,7 +9,7 @@ public class SkeltonController : MonoBehaviour
     enum SkelltonState
     {
         AutoAttacking,
-        Chaging,
+        SkillChaging,
     }
     SkelltonState myState;
 
@@ -17,7 +17,7 @@ public class SkeltonController : MonoBehaviour
     /// 移動を停止する距離
     /// </summary>
     [SerializeField]
-    float movingDistance=0.5f;
+    float movingDistance = 0.5f;
 
     /// <summary>
     /// 動的に変化する移動速度
@@ -34,10 +34,39 @@ public class SkeltonController : MonoBehaviour
 
     float attackInterval;
     [SerializeField]
-    const float attackIntervalMax=100;
+     float attackIntervalMax = 100;
 
     [SerializeField]
-    const float damage=1;
+     float autoAttackDamage = 1;
+
+    /// <summary>
+    /// スキルプレハブ
+    /// </summary>
+    [SerializeField]
+    GameObject skillPrehub;
+
+    /// <summary>
+    /// スキルチャージ中に発生するエフェクト
+    /// </summary>
+    [SerializeField]
+    GameObject skillEffect;
+
+    GameObject instantSkillEffect;
+
+    /// <summary>
+    /// スキル１の予兆が表示される時間
+    /// </summary>
+    public const float SphereSkillDangerTime = 200;
+
+    /// <summary>
+    /// 動的に変化する、予兆発生からモーション再生までのインターバル
+    /// </summary>
+    float skillDangerTime;
+
+    /// <summary>
+    /// スキルプレハブを設置したことを表すフラグ
+    /// </summary>
+    bool skillPlaced;
 
     private void Awake()
     {
@@ -47,19 +76,14 @@ public class SkeltonController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        myState = SkelltonState.AutoAttacking;
-        moveSpeed = 0;
+        instantSkillEffect = null;
+        myState = SkelltonState.SkillChaging;
         attackInterval = attackIntervalMax;
     }
 
     // Update is called once per frame
     void Update()
     {
-        moveSpeed += 0.002f;
-        if(moveSpeed>moveSpeedMax)
-        {
-            moveSpeed = moveSpeedMax;
-        }
         attackInterval--;
     }
 
@@ -72,12 +96,17 @@ public class SkeltonController : MonoBehaviour
         }
         else
         {
-
+            SkillPlace();
         }
     }
 
-    private void Move()
+    void Move()
     {
+        moveSpeed += 0.002f;
+        if (moveSpeed > moveSpeedMax)
+        {
+            moveSpeed = moveSpeedMax;
+        }
         Vector3 targetPosition = target.GetPosition();
         float distance = Vector3.Distance(targetPosition, transform.position);
         if (distance > movingDistance)
@@ -94,19 +123,50 @@ public class SkeltonController : MonoBehaviour
         }
     }
 
-    public void Attack()
+    void Attack()
     {
-        if(attackInterval<0)
+        if (attackInterval < 0)
         {
             attackInterval = attackIntervalMax;
-            animator.SetBool("Attack",true);
-            target.AddDamage(damage);
+            animator.SetBool("Attack", true);
+            target.AddDamage(autoAttackDamage);
             Debug.Log("attacked!");
         }
     }
 
+    void SkillPlace()
+    {
+        if (skillPlaced)
+        {
+            if(skillDangerTime<0)
+            {
+                animator.SetBool("Skill", true);
+                myState = SkelltonState.AutoAttacking;
+                Destroy(instantSkillEffect.gameObject);
+                instantSkillEffect = null;
+            }
+            else
+            {
+                skillDangerTime--;
+            }
+        }
+        else
+        {
+            skillPlaced = true;
+            skillDangerTime = SphereSkillDangerTime;
+            GameObject skill = Instantiate(skillPrehub, transform.position, new Quaternion());
+            skill.transform.parent = transform.parent;
+            Quaternion effectQua = new Quaternion();
+            effectQua = Quaternion.Euler(new Vector3(-90, 0, 0));
+            instantSkillEffect= Instantiate(skillEffect, transform.position, effectQua);
+            instantSkillEffect.transform.parent = transform.parent;
+        }
+    }
+
+
     private void LateUpdate()
     {
-            animator.SetBool("Attack",false);
+        animator.SetBool("Attack", false);
+        animator.SetBool("Skill", false);
     }
 }

@@ -22,6 +22,8 @@ public class DangerZoneAtacck : MonoBehaviour
     void Start()
     {
         deletedDangerZone = false;
+        alfa = GetComponent<Renderer>().material.color.a;
+        waitingInterval = SkeltonController.SphereSkillDangerTime;
     }
 
     // Update is called once per frame
