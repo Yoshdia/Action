@@ -86,6 +86,7 @@ public class SkeltonController : EnemyBasic
         if (myState == SkeltonState.AutoAttacking)
         {
             Move();
+            SkillChange();
         }
         else
         {
@@ -115,7 +116,6 @@ public class SkeltonController : EnemyBasic
             moveSpeed = 0;
             animator.SetBool("Walk", false);
             Attack();
-            //myState = SkeltonState.SkillChaging;
         }
     }
 
@@ -164,6 +164,26 @@ public class SkeltonController : EnemyBasic
             }
 
             ShotSkill.SetSkillPrehub(trans);
+        }
+    }
+    float timeLine;
+
+    void SkillChange()
+    {
+        timeLine++;
+        if (timeLine == 500)
+        {
+            myState = SkeltonState.SkillChaging;
+            skill = SkeltonSkill.SphereExplosion;
+        }
+        else if(timeLine==1500)
+        {
+            myState = SkeltonState.SkillChaging;
+            skill = SkeltonSkill.Search;
+        }
+        else if(timeLine>2000)
+        {
+            timeLine = 0;
         }
     }
 

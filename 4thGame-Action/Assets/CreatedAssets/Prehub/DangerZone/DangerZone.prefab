@@ -108,5 +108,5 @@ MonoBehaviour:
   alfaSpeed: 0.01
   fallEffect: {fileID: 7023782093216410939, guid: bfadf9c91ac7dd545beb8031fdd568b2,
     type: 3}
-  explosionEffect: {fileID: 2479892600222035680, guid: 3ac4248c78ec96745ab4e636dc183f22,
+  explosionEffect: {fileID: 4644778294020724409, guid: 08ec4a84b8901fe4c8bef9af96d11f28,
     type: 3}
