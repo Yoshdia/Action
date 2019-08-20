@@ -8,6 +8,7 @@ public class InputController : MonoBehaviour
     [HideInInspector] public float inputJump;
     [HideInInspector] public float inputHorizontal = 0;
     [HideInInspector] public float inputVertical = 0;
+    [HideInInspector] public bool inputAttack = false;
 
     //カメラから見てどの方向に移動するかのベクトル
     [HideInInspector] private Vector3 moveInput;
@@ -17,6 +18,7 @@ public class InputController : MonoBehaviour
         inputJump = Input.GetAxis("Jump");
         inputHorizontal = Input.GetAxisRaw("Horizontal");
         inputVertical = Input.GetAxisRaw("Vertical");
+        inputAttack = Input.GetMouseButtonDown(0);
     }
 
     // Update is called once per frame
@@ -73,5 +75,10 @@ public class InputController : MonoBehaviour
     public float HasJumpInput()
     {
         return inputJump;
+    }
+
+    public bool HasAttackInput()
+    {
+        return inputAttack;
     }
 }

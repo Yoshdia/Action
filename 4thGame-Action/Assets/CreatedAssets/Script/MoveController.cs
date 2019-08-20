@@ -71,6 +71,11 @@ public class MoveController : MonoBehaviour
     ///</summary>
     private const float _raycastSearchDistance = 100f;
 
+    bool isAttacking;
+
+    int attackInterval;
+    private const int AttackIntervalMax=100;
+
     void Awake()
     {
         animator = GetComponent<Animator>();
@@ -81,6 +86,8 @@ public class MoveController : MonoBehaviour
     private void Start()
     {
         isJumping = false;
+        isAttacking = false;
+        attackInterval = AttackIntervalMax;
     }
 
     void Update()
@@ -92,6 +99,12 @@ public class MoveController : MonoBehaviour
             isJumping = true;
             animator.SetBool("Jump", true);
             rigidbody.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
+        }
+
+        if(input.HasAttackInput()&&!isAttacking)
+        {
+            isAttacking = true;
+            animator.SetBool("Attack", true);
         }
     }
 
@@ -106,12 +119,12 @@ public class MoveController : MonoBehaviour
         }
     }
 
-
     private void FixedUpdate()
     {
         Move();
         Turn();
         Jumping();
+        Attack();
     }
 
     private void Move()
@@ -138,6 +151,20 @@ public class MoveController : MonoBehaviour
         if (!isJumping)
             return;
         CheckGroundDistance();
+    }
+
+    private void Attack()
+    {
+        if (!isAttacking)
+        {
+            return;
+        }
+        attackInterval--;
+        if(attackInterval<0)
+        {
+            attackInterval = AttackIntervalMax;
+            isAttacking = false; ;
+        }
     }
 
     private void CheckGroundDistance()
@@ -200,6 +227,12 @@ public class MoveController : MonoBehaviour
         }
     }
 
+    private void LateUpdate()
+    {
+        animator.SetBool("Attack", false);
+    }
+
+
     public Transform GetTransform()
     {
         return transform;
@@ -215,6 +248,10 @@ public class MoveController : MonoBehaviour
     }
 
     public void FootL()
+    {
+    }
+
+    public void Hit()
     {
     }
 }
