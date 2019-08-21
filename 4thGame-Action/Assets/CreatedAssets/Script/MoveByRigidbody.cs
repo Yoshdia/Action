@@ -39,7 +39,9 @@ public class MoveByRigidbody : MonoBehaviour
     /// <param name="moveSpeed">移動する速度</param>
     public void Move(Vector3 direction,float speed)
     {
-        Vector3 movement = direction * moveSpeed * Time.deltaTime;
+        Vector3 movement =( direction * speed) * Time.deltaTime;
         rigidbody.MovePosition(rigidbody.position + movement);
+        Debug.Log("" + movement);
+
     }
 }

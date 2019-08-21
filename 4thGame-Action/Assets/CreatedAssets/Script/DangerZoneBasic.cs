@@ -30,6 +30,11 @@ public class DangerZoneBasic : MonoBehaviour
     // Update is called once per frame
     protected virtual void Update()
     {
+
+    }
+
+    private void FixedUpdate()
+    {
         DeleatingZone();
         if (deletedDangerZone)
         {

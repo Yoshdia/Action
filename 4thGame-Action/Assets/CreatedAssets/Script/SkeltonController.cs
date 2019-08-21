@@ -49,7 +49,7 @@ public class SkeltonController : MonoBehaviour
     /// 移動速度の最大
     /// </summary>
     [SerializeField]
-    float moveSpeedMax = 0.1f;
+    float moveSpeedMax = 7.0f;
 
     private EnemySkillBasic sphereSkill;
     private EnemySkillBasic searchSkill;
@@ -103,7 +103,6 @@ public class SkeltonController : MonoBehaviour
         {
             Move();
             SkillChange();
-            Attack();
         }
         else
         {
@@ -113,7 +112,7 @@ public class SkeltonController : MonoBehaviour
 
     void Move()
     {
-        moveSpeed += 0.002f;
+        moveSpeed += 0.2f;
         if (moveSpeed > moveSpeedMax)
         {
             moveSpeed = moveSpeedMax;
@@ -210,5 +209,6 @@ public class SkeltonController : MonoBehaviour
     void LateUpdate()
     {
         attackComponent.AttackMotionEnd("Attack");
+        skillPlaceComponent.StopSkillAttackAnimation("Skill");
     }
 }
