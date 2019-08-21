@@ -23,7 +23,12 @@ public class MoveController : MonoBehaviour
     bool notJumping = true;
     JumpByRigidbody jumpComponent;
 
+    /// <summary>
+    /// 攻撃中か
+    /// </summary>
     bool isAttacking;
+
+    int comboCount;
 
     void Awake()
     {
@@ -41,6 +46,7 @@ public class MoveController : MonoBehaviour
         notJumping = true;
         isAttacking = false;
         weapon.enabled = false;
+        comboCount = 0;
     }
 
 
@@ -58,9 +64,9 @@ public class MoveController : MonoBehaviour
         if (input.HasAttackInput() && !isAttacking)
         {
             isAttacking = true;
-            attackInterval = attackIntervalMax;
-            animator.SetBool("Attack1", true);
+            attackComponent.AttackAndIntervalReset("Attack1");
             weapon.enabled = true;
+            comboCount++;
         }
     }
 
@@ -109,31 +115,25 @@ public class MoveController : MonoBehaviour
         notJumping = jumpComponent.CanJumping();
     }
 
-    /// <summary>
-    /// オートアタックの間隔、ダメージ
-    /// </summary>
-    protected float attackInterval;
-
-    protected float attackIntervalMax = 5;
-
     private void Attack()
     {
         if (isAttacking)
         {
             bool attackEnd=attackComponent.Attack("Attack1");
-            //attackInterval--;
             if(attackEnd)
             {
                 attackComponent.AttackMotionEnd("Attack1");
                 weapon.enabled = false;
                 isAttacking = false;
+                comboCount = 0;
             }
             else
             {
-                if(input.HasAttackInput())
+                if(input.HasAttackInput()&&comboCount<4)
                 {
-                    attackInterval = attackIntervalMax;
+                    attackComponent.AttackAndIntervalReset("Attack1");
                     weapon.enabled = true;
+                    comboCount++;
                 }
             }
         }

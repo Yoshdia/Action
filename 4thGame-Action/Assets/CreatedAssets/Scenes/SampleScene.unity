@@ -246,8 +246,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 2, y: 2, z: 2}
-  m_Center: {x: -0.17672877, y: -0.076671794, z: 0.9112761}
+  m_Size: {x: 4, y: 4, z: 4}
+  m_Center: {x: 0, y: 0, z: 1.5}
 --- !u!1 &534669902
 GameObject:
   m_ObjectHideFlags: 0
@@ -777,6 +777,42 @@ PrefabInstance:
         type: 3}
       propertyPath: movingDistance
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8595665029900585887, guid: 4a4a371038ac7204ebe9bb137e69601c,
+        type: 3}
+      propertyPath: HitEffect
+      value: 
+      objectReference: {fileID: 6816711322134404657, guid: 9349404ba0b9c6840b1817f6508e5330,
+        type: 3}
+    - target: {fileID: 8595665031371909270, guid: 4a4a371038ac7204ebe9bb137e69601c,
+        type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8595665029900585884, guid: 4a4a371038ac7204ebe9bb137e69601c,
+        type: 3}
+      propertyPath: m_Radius
+      value: 0.06591764
+      objectReference: {fileID: 0}
+    - target: {fileID: 8595665029900585884, guid: 4a4a371038ac7204ebe9bb137e69601c,
+        type: 3}
+      propertyPath: m_Height
+      value: 0.16186416
+      objectReference: {fileID: 0}
+    - target: {fileID: 8595665029900585884, guid: 4a4a371038ac7204ebe9bb137e69601c,
+        type: 3}
+      propertyPath: m_Center.x
+      value: 0.013934247
+      objectReference: {fileID: 0}
+    - target: {fileID: 8595665029900585884, guid: 4a4a371038ac7204ebe9bb137e69601c,
+        type: 3}
+      propertyPath: m_Center.y
+      value: 0.08055323
+      objectReference: {fileID: 0}
+    - target: {fileID: 8595665029900585884, guid: 4a4a371038ac7204ebe9bb137e69601c,
+        type: 3}
+      propertyPath: m_Center.z
+      value: -0.00014814537
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4a4a371038ac7204ebe9bb137e69601c, type: 3}

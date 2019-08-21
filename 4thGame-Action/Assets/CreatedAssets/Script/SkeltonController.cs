@@ -17,6 +17,7 @@ public class SkeltonController : MonoBehaviour
     AttackAndAnimation attackComponent;
     EnemySkillPlace skillPlaceComponent;
 
+
     enum SkeltonState
     {
         AutoAttacking,
@@ -65,12 +66,17 @@ public class SkeltonController : MonoBehaviour
     /// </summary>
     GameObject instantSkillEffect;
 
-
-
     /// <summary>
     /// スキルプレハブを設置したことを表すフラグ
     /// </summary>
     bool skillPlaced;
+
+    [SerializeField]
+    GameObject HitEffect;
+
+    float hitPoint;
+    [SerializeField]
+    float MaxHitPoint = 10;
 
     void Awake()
     {
@@ -84,6 +90,7 @@ public class SkeltonController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        hitPoint = MaxHitPoint;
         instantSkillEffect = null;
         myState = SkeltonState.AutoAttacking;
         skill = SkeltonSkill.Search;
@@ -99,15 +106,17 @@ public class SkeltonController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (myState == SkeltonState.AutoAttacking)
-        {
-            Move();
-            SkillChange();
-        }
-        else
-        {
-            SkillPlace();
-        }
+
+            if (myState == SkeltonState.AutoAttacking)
+            {
+                Move();
+                SkillChange();
+                Dead();
+            }
+            else
+            {
+                SkillPlace();
+            }
     }
 
     void Move()
@@ -147,7 +156,7 @@ public class SkeltonController : MonoBehaviour
     {
         if (skillPlaced)
         {
-            bool attacked = skillPlaceComponent.DangerSkillAttacked("SkillChaging","Skill");
+            bool attacked = skillPlaceComponent.DangerSkillAttacked("SkillChaging", "Skill");
             if (attacked)
             {
                 myState = SkeltonState.AutoAttacking;
@@ -206,11 +215,30 @@ public class SkeltonController : MonoBehaviour
         }
     }
 
+    float destroyCount = 300;
+
+    void Dead()
+    {
+        if (hitPoint > 0)
+        {
+            return;
+        }
+        animator.SetBool("Down", true);
+        destroyCount--;
+        if (destroyCount<0)
+        {
+            Destroy(transform.gameObject);
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
-        if(other.tag=="PlayerAttack")
+        if (other.tag == "PlayerAttack")
         {
-            Debug.Log("OOO");
+            Vector3 effectPos = transform.position;
+            effectPos.y += 2.0f;
+            Instantiate(HitEffect, effectPos, new Quaternion());
+            hitPoint--;
         }
     }
 
