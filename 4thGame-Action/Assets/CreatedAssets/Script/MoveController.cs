@@ -5,103 +5,52 @@ using UnityEngine;
 public class MoveController : MonoBehaviour
 {
     Animator animator;
-    private Rigidbody rigidbody;
-
     InputController input;
+    MoveByRigidbody moveComponent;
+    Turn turnComponent;
+    AttackAndAnimation attackComponent;
+
     /// <summary>
     ///カメラに基づいた移動方向 inputから受け取る
     /// </summary>
     Vector3 inputMovement;
 
-    [SerializeField]
-    ///<summary>
-    /// 移動速度
-    ///</summary>
-    float moveSpeed = 10;
-
     /// <summary>
-    /// ジャンプ中かどうか
+    /// ジャンプしていないかどうか
     /// </summary>
-    bool isJumping = false;
-
-    ///<summary>
-    ///    ジャンプの強さ
-    ///</summary>
-    [SerializeField] private float jumpPower = 5f;
-
-    ///<summary>
-    ///    接地してから何フレーム経過したか
-    ///    接地してない間は常にゼロとする
-    ///</summary>
-    private int isGround = 0;
-
-    ///<summary>
-    ///    接地してない間、何フレーム経過したか
-    ///    接地している間は常にゼロとする
-    ///</summary>
-    private int notGround = 0;
-
-    ///<summary>
-    ///    このフレーム数分接地していたらor接地していなかったら
-    ///    状態が変わったと認識する（ジャンプ開始したor着地した）
-    ///    接地してからキャラの状態が安定するまでに数フレーム用するため、
-    ///    キャラが安定する前に再ジャンプ入力を受け付けてしまうとバグる（ジャンプ出来なくなる）
-    ///</summary>
-    const int JumpingEndCount = 8;
-
-    ///<summary>
-    ///    プレイヤーと地面の間の距離
-    ///    IsGround()が呼ばれるたびに更新される
-    ///</summary>
-    private float groundDistance = 0f;
-
-    ///<summary>
-    ///    _groundDistanceがこの値以下の場合接地していると判定する
-    ///</summary>
-    private const float GroundDistanceLimit = 0.5f;
-
-    ///<summary>
-    ///    判定元の原点が地面に極端に近いとrayがヒットしない場合があるので、
-    ///    オフセットを設けて確実にヒットするようにする
-    ///</summary>
-    private Vector3 _raycastOffset = new Vector3(0f, 0.005f, 0f);
-
-    ///<summary>
-    ///    プレイヤーキャラから下向きに地面判定のrayを飛ばす時の上限距離
-    ///</summary>
-    private const float _raycastSearchDistance = 100f;
+    bool notJumping = true;
+    JumpByRigidbody jumpComponent;
 
     bool isAttacking;
-
-    int attackInterval;
-    private const int AttackIntervalMax=100;
 
     void Awake()
     {
         animator = GetComponent<Animator>();
         input = GetComponent<InputController>();
-        rigidbody = GetComponent<Rigidbody>();
+        moveComponent = GetComponent<MoveByRigidbody>();
+        jumpComponent = GetComponent<JumpByRigidbody>();
+        turnComponent = GetComponent<Turn>();
+        attackComponent = GetComponent<AttackAndAnimation>();
     }
 
     private void Start()
     {
-        isJumping = false;
+        notJumping = true;
         isAttacking = false;
-        attackInterval = AttackIntervalMax;
     }
 
     void Update()
     {
         inputMovement = input.GetMovement();
 
-        if (input.HasJumpInput() > 0&&!isJumping)
+        if (input.HasJumpInput() > 0 && notJumping)
         {
-            isJumping = true;
+            notJumping = false;
             animator.SetBool("Jump", true);
-            rigidbody.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
+            jumpComponent.Jump();
         }
 
-        if(input.HasAttackInput()&&!isAttacking)
+        if (input.HasAttackInput() && !isAttacking)
         {
             isAttacking = true;
             animator.SetBool("Attack", true);
@@ -121,23 +70,17 @@ public class MoveController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Move();
+        moveComponent.Move(inputMovement);
         Turn();
         Jumping();
         Attack();
     }
 
-    private void Move()
-    {
-        Vector3 movement = inputMovement * moveSpeed * Time.deltaTime;
-        rigidbody.MovePosition(rigidbody.position + movement);
-    }
-
     private void Turn()
     {
-        if (input.HasMoveInput()&&inputMovement!=Vector3.zero)
+        if (input.HasMoveInput() && inputMovement != Vector3.zero)
         {
-            transform.rotation = Quaternion.LookRotation(inputMovement);
+            turnComponent.LookRotate(inputMovement);
             animator.SetBool("Walk", true);
         }
         else
@@ -148,9 +91,15 @@ public class MoveController : MonoBehaviour
 
     private void Jumping()
     {
-        if (!isJumping)
+        if (notJumping)
             return;
-        CheckGroundDistance();
+        if (!jumpComponent.ArrivedGround())
+        {
+            return;
+        }
+        animator.SetBool("Jump", false);
+
+        notJumping = jumpComponent.CanJumping();
     }
 
     private void Attack()
@@ -159,79 +108,14 @@ public class MoveController : MonoBehaviour
         {
             return;
         }
-        attackInterval--;
-        if(attackInterval<0)
-        {
-            attackInterval = AttackIntervalMax;
-            isAttacking = false; ;
-        }
-    }
-
-    private void CheckGroundDistance()
-    {
-        var layerMask = LayerMask.GetMask("Ground");
-        RaycastHit hit;
-
-        // プレイヤーの位置から下向きにRaycastを飛ばし一番近いものがヒットする
-        var isGroundHit = Physics.Raycast(
-                transform.position + _raycastOffset,
-                transform.TransformDirection(Vector3.down),
-                out hit,
-                _raycastSearchDistance,
-                layerMask
-            );
-
-        if (isGroundHit)
-        {
-            groundDistance = hit.distance;
-        }
-        else
-        {
-            // ヒットしなかった場合はキャラの下方に地面が存在しないものとして扱う
-            groundDistance = float.MaxValue;
-        }
-
-        // 地面とキャラの距離は環境によって様々で
-        // 完全にゼロにはならない時もあるため、
-        // ジャンプしていない時の値に多少のマージンをのせた
-        // 一定値以下を接地と判定する
-        // 通常あり得ないと思われるが、オーバーフローされると再度アクションが実行されてしまうので、越えたところで止める
-        if (groundDistance < GroundDistanceLimit)
-        {
-            if (isGround <= JumpingEndCount)
-            {
-                isGround += 1;
-                notGround = 0;
-            }
-            animator.SetBool("Jump", false);
-        }
-        else
-        {
-            if (notGround <= JumpingEndCount)
-            {
-                isGround = 0;
-                notGround += 1;
-            }
-        }
-
-        // 接地後またはジャンプ後、特定フレーム分状態の変化が無ければ、
-        // 状態が安定したものとして接地処理またはジャンプ処理を行う
-        if (JumpingEndCount == isGround && notGround == 0)
-        {
-            isJumping = false;
-        }
-        else
-        if (JumpingEndCount == notGround && isGround == 0)
-        {
-            isJumping = false;
-        }
+        attackComponent.Attack("Attack");
+        isAttacking = false ;
     }
 
     private void LateUpdate()
     {
-        animator.SetBool("Attack", false);
+        attackComponent.AttackMotionEnd("Attack");
     }
-
 
     public Transform GetTransform()
     {

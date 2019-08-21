@@ -10,20 +10,6 @@ public class EnemySkillBasic : MonoBehaviour
     [SerializeField]
     public GameObject skillPrehub;
 
-
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     /// <summary>
     /// 予兆、後に攻撃が発生するプレハブを設置する
     /// </summary>

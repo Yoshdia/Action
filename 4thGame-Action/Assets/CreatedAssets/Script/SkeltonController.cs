@@ -2,8 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SkeltonController : EnemyBasic
+public class SkeltonController : MonoBehaviour
 {
+    /// <summary>
+    /// 移動や攻撃の対象になるオブジェクト
+    /// </summary>
+    [SerializeField]
+    protected MoveController target;
+
+    Animator animator;
+
+    HeadForTargetByMove headForTarget;
+    Turn turnComponent;
+    AttackAndAnimation attackComponent;
+    EnemySkillPlace skillPlaceComponent;
+
     enum SkeltonState
     {
         AutoAttacking,
@@ -17,6 +30,9 @@ public class SkeltonController : EnemyBasic
         Search,
     }
     SkeltonSkill skill;
+
+    [SerializeField]
+    protected float autoAttackDamage = 1;
 
     /// <summary>
     /// 移動を停止する距離
@@ -49,25 +65,25 @@ public class SkeltonController : EnemyBasic
     /// </summary>
     GameObject instantSkillEffect;
 
-    /// <summary>
-    /// 動的に変化する、予兆発生からモーション再生までのインターバル
-    /// </summary>
-    float skillDangerTime;
+
 
     /// <summary>
     /// スキルプレハブを設置したことを表すフラグ
     /// </summary>
     bool skillPlaced;
 
-    protected override void Awake()
+    void Awake()
     {
-        base.Awake();
+        headForTarget = GetComponent<HeadForTargetByMove>();
+        turnComponent = GetComponent<Turn>();
+        attackComponent = GetComponent<AttackAndAnimation>();
+        animator = GetComponent<Animator>();
+        skillPlaceComponent = GetComponent<EnemySkillPlace>();
     }
 
     // Start is called before the first frame update
-    protected override void Start()
+    void Start()
     {
-        base.Start();
         instantSkillEffect = null;
         myState = SkeltonState.AutoAttacking;
         skill = SkeltonSkill.Search;
@@ -76,9 +92,9 @@ public class SkeltonController : EnemyBasic
     }
 
     // Update is called once per frame
-    protected override void Update()
+    void Update()
     {
-        base.Update();
+
     }
 
     private void FixedUpdate()
@@ -87,6 +103,7 @@ public class SkeltonController : EnemyBasic
         {
             Move();
             SkillChange();
+            Attack();
         }
         else
         {
@@ -105,10 +122,8 @@ public class SkeltonController : EnemyBasic
         float distance = Vector3.Distance(targetPosition, transform.position);
         if (distance > movingDistance)
         {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetPosition - transform.position), 0.3f);
-            Vector3 targetForword = transform.forward;
-            targetForword.y = 0;
-            transform.position += targetForword * moveSpeed;
+            turnComponent.LookRotate(targetPosition - transform.position);
+            headForTarget.HeadForTarget(targetPosition, moveSpeed);
             animator.SetBool("Walk", true);
         }
         else
@@ -119,36 +134,40 @@ public class SkeltonController : EnemyBasic
         }
     }
 
+    void Attack()
+    {
+        bool attacked = attackComponent.Attack("Attack");
+        if (attacked)
+        {
+            target.AddDamage(autoAttackDamage);
+            Debug.Log("attacked!");
+        }
+    }
+
     void SkillPlace()
     {
         if (skillPlaced)
         {
-            if (skillDangerTime < 0)
+            bool attacked = skillPlaceComponent.DangerSkillAttacked("SkillChaging","Skill");
+            if (attacked)
             {
-                animator.SetBool("Skill", true);
-                animator.SetBool("SkillChaging", false);
                 myState = SkeltonState.AutoAttacking;
                 Destroy(instantSkillEffect.gameObject);
                 instantSkillEffect = null;
                 skillPlaced = false;
             }
-            else
-            {
-                skillDangerTime--;
-            }
         }
         else
         {
-            animator.SetBool("SkillChaging", true);
             skillPlaced = true;
-            skillDangerTime = SphereSkill.dangerTime;
             Quaternion effectQua = new Quaternion();
             effectQua = Quaternion.Euler(new Vector3(-90, 0, 0));
             instantSkillEffect = Instantiate(sphereSkillEffect, transform.position, effectQua);
             instantSkillEffect.transform.parent = transform;
 
             EnemySkillBasic ShotSkill = null;
-            Transform trans = transform;
+
+            Transform targetTransform = transform;
             switch (skill)
             {
                 case (SkeltonSkill.SphereExplosion):
@@ -156,16 +175,17 @@ public class SkeltonController : EnemyBasic
                     break;
                 case (SkeltonSkill.Search):
                     ShotSkill = searchSkill;
-                    trans = target.GetTransform();
+                    targetTransform = target.GetTransform();
                     break;
                 default:
                     ShotSkill = sphereSkill;
                     break;
             }
 
-            ShotSkill.SetSkillPrehub(trans);
+            skillPlaceComponent.SkillPlace(SphereSkill.dangerTime, ShotSkill, targetTransform, "SkillChaging");
         }
     }
+
     float timeLine;
 
     void SkillChange()
@@ -176,20 +196,19 @@ public class SkeltonController : EnemyBasic
             myState = SkeltonState.SkillChaging;
             skill = SkeltonSkill.SphereExplosion;
         }
-        else if(timeLine==1500)
+        else if (timeLine == 1500)
         {
             myState = SkeltonState.SkillChaging;
             skill = SkeltonSkill.Search;
         }
-        else if(timeLine>2000)
+        else if (timeLine > 2000)
         {
             timeLine = 0;
         }
     }
 
-    protected override void LateUpdate()
+    void LateUpdate()
     {
-        base.LateUpdate();
-        animator.SetBool("Skill", false);
+        attackComponent.AttackMotionEnd("Attack");
     }
 }
