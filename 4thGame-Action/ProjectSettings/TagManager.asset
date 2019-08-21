@@ -6,6 +6,8 @@ TagManager:
   tags:
   - DangerZone
   - AttackingZone
+  - Collide
+  - PlayerAttack
   layers:
   - Default
   - TransparentFX

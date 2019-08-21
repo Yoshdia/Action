@@ -18,7 +18,7 @@ public class InputController : MonoBehaviour
         inputJump = Input.GetAxis("Jump");
         inputHorizontal = Input.GetAxisRaw("Horizontal");
         inputVertical = Input.GetAxisRaw("Vertical");
-        inputAttack = Input.GetMouseButtonDown(0);
+        inputAttack = Input.GetMouseButtonDown(0)||Input.GetKey(KeyCode.Alpha0);
     }
 
     // Update is called once per frame

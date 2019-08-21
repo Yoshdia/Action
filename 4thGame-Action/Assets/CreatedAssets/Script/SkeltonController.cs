@@ -206,6 +206,14 @@ public class SkeltonController : MonoBehaviour
         }
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.tag=="PlayerAttack")
+        {
+            Debug.Log("OOO");
+        }
+    }
+
     void LateUpdate()
     {
         attackComponent.AttackMotionEnd("Attack");
