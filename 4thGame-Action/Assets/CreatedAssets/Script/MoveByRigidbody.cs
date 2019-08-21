@@ -41,7 +41,5 @@ public class MoveByRigidbody : MonoBehaviour
     {
         Vector3 movement =( direction * speed) * Time.deltaTime;
         rigidbody.MovePosition(rigidbody.position + movement);
-        Debug.Log("" + movement);
-
     }
 }

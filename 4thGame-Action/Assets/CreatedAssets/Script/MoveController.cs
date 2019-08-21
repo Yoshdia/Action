@@ -12,15 +12,6 @@ public class MoveController : MonoBehaviour
     [SerializeField]
     BoxCollider weapon;
 
-    enum PlayerCombo
-    {
-        No,
-        Once,
-        Twice,
-        threeTimes,
-    }
-    PlayerCombo combo;
-
     /// <summary>
     ///カメラに基づいた移動方向 inputから受け取る
     /// </summary>
@@ -33,7 +24,6 @@ public class MoveController : MonoBehaviour
     JumpByRigidbody jumpComponent;
 
     bool isAttacking;
-    bool canAttack;
 
     void Awake()
     {
@@ -48,7 +38,6 @@ public class MoveController : MonoBehaviour
 
     private void Start()
     {
-        canAttack = true;
         notJumping = true;
         isAttacking = false;
         weapon.enabled = false;
@@ -66,48 +55,13 @@ public class MoveController : MonoBehaviour
             jumpComponent.Jump();
         }
 
-
-        //if (input.HasAttackInput() && isAttacking && combo != PlayerCombo.No && attackInterval <= comboInterval)
-        //{
-        //    attackInterval = attackIntervalMax;
-        //    weapon.enabled = true;
-
-        //    switch (combo)
-        //    {
-        //        case (PlayerCombo.Once):
-        //            animator.SetBool("Attack2", true);
-        //            animator.SetBool("Attack1", false);
-        //            combo = PlayerCombo.Twice;
-        //            break;
-        //        case (PlayerCombo.Twice):
-        //            combo = PlayerCombo.threeTimes;
-        //            animator.SetBool("Attack3", true);
-        //            animator.SetBool("Attack2", false);
-        //            break;
-        //        case (PlayerCombo.threeTimes):
-        //            animator.SetBool("Attack4", true);
-        //            animator.SetBool("Attack3", false);
-        //            combo = PlayerCombo.No;
-        //            break;
-
-        //    }
-
-        //}
-        //else 
-        if (input.HasAttackInput() && !isAttacking && canAttack && combo == PlayerCombo.No)
+        if (input.HasAttackInput() && !isAttacking)
         {
-            canAttack = false;
             isAttacking = true;
             attackInterval = attackIntervalMax;
             animator.SetBool("Attack1", true);
-            animator.SetBool("Attack2", true);
-            animator.SetBool("Attack3", true);
-            animator.SetBool("Attack4", true);
-
             weapon.enabled = true;
-            //combo = PlayerCombo.Once;
         }
-
     }
 
     //接触中にtagが変わるオブジェクトがあるためOnTriggerStay
@@ -159,24 +113,18 @@ public class MoveController : MonoBehaviour
     /// オートアタックの間隔、ダメージ
     /// </summary>
     protected float attackInterval;
-    [SerializeField]
-    protected float attackIntervalMax = 100;
 
-    //float comboInterval = 90;
-    float comboInterval = 60;
+    protected float attackIntervalMax = 5;
 
     private void Attack()
     {
         if (isAttacking)
         {
-            attackInterval--;
-            if(attackInterval< comboInterval)
+            bool attackEnd=attackComponent.Attack("Attack1");
+            //attackInterval--;
+            if(attackEnd)
             {
-                animator.SetBool("Attack1", false);
-                animator.SetBool("Attack2", false);
-                animator.SetBool("Attack3", false);
-                animator.SetBool("Attack4", false);
-                canAttack = true;
+                attackComponent.AttackMotionEnd("Attack1");
                 weapon.enabled = false;
                 isAttacking = false;
             }
@@ -189,17 +137,11 @@ public class MoveController : MonoBehaviour
                 }
             }
         }
-        if (attackInterval > 0)
-        {
-            return;
-        }
     }
 
     private void LateUpdate()
     {
         //attackComponent.AttackMotionEnd("Attack");
-
-
     }
 
     public Transform GetTransform()
