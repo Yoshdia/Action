@@ -12,7 +12,6 @@ public class MoveController : MonoBehaviour
     [SerializeField]
     BoxCollider weapon;
 
-
     /// <summary>
     ///カメラに基づいた移動方向 inputから受け取る
     /// </summary>
@@ -29,7 +28,11 @@ public class MoveController : MonoBehaviour
     /// </summary>
     bool isAttacking;
 
+    bool isFireAttacking;
+
     int comboCount;
+
+    FireShot fireSkill;
 
     void Awake()
     {
@@ -39,6 +42,7 @@ public class MoveController : MonoBehaviour
         jumpComponent = GetComponent<JumpByRigidbody>();
         turnComponent = GetComponent<Turn>();
         attackComponent = GetComponent<AttackAndAnimation>();
+        fireSkill = GetComponent<FireShot>();
     }
 
 
@@ -48,6 +52,7 @@ public class MoveController : MonoBehaviour
         isAttacking = false;
         weapon.enabled = false;
         comboCount = 0;
+        isFireAttacking = false;
     }
 
 
@@ -62,14 +67,22 @@ public class MoveController : MonoBehaviour
             jumpComponent.Jump();
         }
 
-        if (input.HasAttackInput() && !isAttacking)
+        if (input.HasAttackInput() && !isAttacking && !isFireAttacking)
         {
             isAttacking = true;
             attackComponent.AttackAndIntervalReset("Attack1");
             weapon.enabled = true;
             comboCount++;
         }
+
+        if (input.HasFireInput() > 0 && !isFireAttacking && !isAttacking)
+        {
+            isFireAttacking = true;
+            fireSkill.Fire("Fire", transform.forward);
+        }
+
     }
+
 
     //接触中にtagが変わるオブジェクトがあるためOnTriggerStay
     private void OnTriggerStay(Collider other)
@@ -80,6 +93,11 @@ public class MoveController : MonoBehaviour
             //AttackingZone側でも発生してから1f後に削除されるような仕様になっているが、複数ヒットしてしまうことがあるためこちらからもDestroy関数を呼ぶ
             Destroy(other.gameObject);
         }
+        else if (other.tag == "Enemy")
+        {
+            //Collider[] collide=other;
+            //Debug.Log("" + collide.GetValue());
+        }
     }
 
     private void FixedUpdate()
@@ -88,6 +106,7 @@ public class MoveController : MonoBehaviour
         Turn();
         Jumping();
         Attack();
+        isFireAttacking = fireSkill.CountInterval();
     }
 
     private void Turn()
@@ -120,8 +139,8 @@ public class MoveController : MonoBehaviour
     {
         if (isAttacking)
         {
-            bool attackEnd=attackComponent.Attack("Attack1");
-            if(attackEnd)
+            bool attackEnd = attackComponent.Attack("Attack1");
+            if (attackEnd)
             {
                 attackComponent.AttackMotionEnd("Attack1");
                 weapon.enabled = false;
@@ -130,7 +149,7 @@ public class MoveController : MonoBehaviour
             }
             else
             {
-                if(input.HasAttackInput()&&comboCount<4)
+                if (input.HasAttackInput() && comboCount < 4)
                 {
                     attackComponent.AttackAndIntervalReset("Attack1");
                     weapon.enabled = true;
@@ -143,6 +162,7 @@ public class MoveController : MonoBehaviour
     private void LateUpdate()
     {
         //attackComponent.AttackMotionEnd("Attack");
+        fireSkill.StopAnimation("Fire");
     }
 
     public Vector3 GetPosition()

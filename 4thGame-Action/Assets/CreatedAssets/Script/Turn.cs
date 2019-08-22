@@ -8,4 +8,9 @@ public class Turn : MonoBehaviour
     {
         transform.rotation = Quaternion.LookRotation(direction);
     }
+
+    public void LookAt(Transform transform)
+    {
+        transform.LookAt(transform);
+    }
 }

@@ -80,10 +80,8 @@ public class TitanController : MonoBehaviour
     {
         hitPoint = MaxHitPoint;
         instantSkillEffect = null;
-        //myState = TitanState.AutoAttacking;
-        //skill = TitanSkill.centerSphere;   
-        myState = TitanState.SkillChaging;
-        skill = TitanSkill.Line;
+        myState = TitanState.AutoAttacking;
+        skill = TitanSkill.CenterSphere;
     }
 
     private void FixedUpdate()
@@ -159,7 +157,7 @@ public class TitanController : MonoBehaviour
             {
                 case (TitanSkill.CenterSphere):
                     ShotSkill = sphereSkill;
-                    targetPosition = new Vector3(0, 0, 0);
+                    targetPosition = new Vector3(3.5f, 0, -12.0f);
                     break;
                 case (TitanSkill.Punch):
                     ShotSkill = punchSkill;

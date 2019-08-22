@@ -5,10 +5,12 @@ using UnityEngine;
 public class InputController : MonoBehaviour
 {
     //入力情報が格納される変数
-    [HideInInspector] public float inputJump;
-    [HideInInspector] public float inputHorizontal = 0;
-    [HideInInspector] public float inputVertical = 0;
-    [HideInInspector] public bool inputAttack = false;
+  float inputJump;
+  float inputHorizontal = 0;
+  float inputVertical = 0;
+  bool inputAttack = false;
+    float inputFire = 0;
+    
 
     //カメラから見てどの方向に移動するかのベクトル
     [HideInInspector] private Vector3 moveInput;
@@ -18,6 +20,7 @@ public class InputController : MonoBehaviour
         inputJump = Input.GetAxis("Jump");
         inputHorizontal = Input.GetAxisRaw("Horizontal");
         inputVertical = Input.GetAxisRaw("Vertical");
+        inputFire = Input.GetAxis("Fire");
         inputAttack = Input.GetMouseButtonDown(0)||Input.GetKey(KeyCode.Alpha0);
     }
 
@@ -80,5 +83,10 @@ public class InputController : MonoBehaviour
     public bool HasAttackInput()
     {
         return inputAttack;
+    }
+
+    public float HasFireInput()
+    {
+        return inputFire;
     }
 }
