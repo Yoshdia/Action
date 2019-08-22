@@ -99,6 +99,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9047918861872450245, guid: f026264206af82a4ab6f69dc2db48972,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 50
+      objectReference: {fileID: 0}
     - target: {fileID: 6003178851758859410, guid: f026264206af82a4ab6f69dc2db48972,
         type: 3}
       propertyPath: effects.Array.size
@@ -203,7 +208,7 @@ PrefabInstance:
     - target: {fileID: 9047918861872450245, guid: f026264206af82a4ab6f69dc2db48972,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 30.000015
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 6003178851758859410, guid: f026264206af82a4ab6f69dc2db48972,
         type: 3}

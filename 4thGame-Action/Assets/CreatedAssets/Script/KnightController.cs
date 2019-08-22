@@ -30,6 +30,7 @@ public class KnightController : MonoBehaviour
     {
         RangeSmash,
         Slash,
+        Dunut,
     }
     KnightSkill skill;
 
@@ -80,6 +81,8 @@ public class KnightController : MonoBehaviour
     GameObject tripleSphereSkill;
     [SerializeField]
     GameObject crossSkill;
+        [SerializeField]
+    GameObject donut;
 
     void Awake()
     {
@@ -97,8 +100,10 @@ public class KnightController : MonoBehaviour
     {
         hitPoint = MaxHitPoint;
         instantSkillEffect = null;
-        myState = KnightState.AutoAttacking;
-        skill = KnightSkill.RangeSmash;
+        //myState = KnightState.AutoAttacking;
+        //skill = KnightSkill.RangeSmash;
+        myState = KnightState.SkillChaging;
+        skill = KnightSkill.Dunut;
     }
 
     private void FixedUpdate()
@@ -185,10 +190,14 @@ public class KnightController : MonoBehaviour
                     ShotSkill = crossSkill;
                     targetPosition = transform.position;
                     break;
-                    //default:
-                    //    ShotSkill = sphereSkill;
-                    //targetTransform = transform;
-                    //    break;
+                    case(KnightSkill.Dunut):
+                    ShotSkill = donut;
+                    targetPosition = transform.position;
+                    break;
+                default:
+                    ShotSkill = tripleSphereSkill;
+                    targetPosition = new Vector3(3.5f, 0, -12.0f);
+                    break;
             }
 
             skillPlaceComponent.SkillPlace(ShotSkill, targetPosition, "SkillChaging");
@@ -210,8 +219,16 @@ public class KnightController : MonoBehaviour
             myState = KnightState.SkillChaging;
             skill = KnightSkill.Slash;
         }
-        else if (timeLine > 1100)
+        else if (timeLine ==1400)
         {
+            myState = KnightState.SkillChaging;
+            skill = KnightSkill.Dunut;
+
+
+        }
+        else if (timeLine > 1800)
+        {
+         
             timeLine = 0;
         }
     }
