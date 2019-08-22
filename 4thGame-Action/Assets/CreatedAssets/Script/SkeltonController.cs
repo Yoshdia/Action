@@ -34,7 +34,7 @@ public class SkeltonController : MonoBehaviour
     SkeltonSkill skill;
 
     [SerializeField]
-    protected float autoAttackDamage = 1;
+     float autoAttackDamage = 1;
 
     /// <summary>
     /// 移動を停止する距離
