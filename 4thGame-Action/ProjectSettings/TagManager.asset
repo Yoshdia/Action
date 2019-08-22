@@ -8,6 +8,8 @@ TagManager:
   - AttackingZone
   - Collide
   - PlayerAttack
+  - Enemy
+  - PlayerHealing
   layers:
   - Default
   - TransparentFX

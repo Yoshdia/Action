@@ -31,15 +31,16 @@ public class DangerZone : MonoBehaviour
     /// </summary>
     [SerializeField]
     float alfaSpeed = 0.01f;
-    float alfa = 1;
 
     bool deletedDangerZone;
+
+    Color material;
 
     // Start is called before the first frame update
     void Start()
     {
         deletedDangerZone = false;
-        alfa = GetComponent<Renderer>().material.color.a;
+        material = GetComponent<Renderer>().material.color;
         waitingInterval = 200;
         effectSet = false;
     }
@@ -59,8 +60,8 @@ public class DangerZone : MonoBehaviour
     {
         if (waitingInterval < 0)
         {
-            alfa -= alfaSpeed;
-            if (alfa < 0)
+            material.a -= alfaSpeed;
+            if (material.a < 0)
             {
                 deletedDangerZone = true;
                 if (!effectSet)
@@ -78,7 +79,7 @@ public class DangerZone : MonoBehaviour
                 }
                 return;
             }
-            GetComponent<Renderer>().material.color = new Color(255, 0, 0, alfa);
+            GetComponent<Renderer>().material.color = material;
         }
         else
         {

@@ -30,9 +30,13 @@ public class MoveController : MonoBehaviour
 
     bool isFireAttacking;
 
+    bool isHealing;
+
     int comboCount;
 
-    FireShot fireSkill;
+    PlayerSkill[] skill;
+    [SerializeField]
+    GameObject skillEffect;
 
     void Awake()
     {
@@ -42,7 +46,7 @@ public class MoveController : MonoBehaviour
         jumpComponent = GetComponent<JumpByRigidbody>();
         turnComponent = GetComponent<Turn>();
         attackComponent = GetComponent<AttackAndAnimation>();
-        fireSkill = GetComponent<FireShot>();
+        skill = GetComponents<PlayerSkill>();
     }
 
 
@@ -53,6 +57,7 @@ public class MoveController : MonoBehaviour
         weapon.enabled = false;
         comboCount = 0;
         isFireAttacking = false;
+        isHealing = false;
     }
 
 
@@ -78,9 +83,16 @@ public class MoveController : MonoBehaviour
         if (input.HasFireInput() > 0 && !isFireAttacking && !isAttacking)
         {
             isFireAttacking = true;
-            fireSkill.Fire("Fire", transform.forward);
+            skill[0].Shot("Fire", transform);
+            Instantiate(skillEffect, transform.position, transform.rotation);
         }
 
+        if(input.HasHealInput()>0&&!isHealing)
+        {
+            isHealing = true;
+            skill[1].Shot("Heal", transform);
+            Instantiate(skillEffect, transform.position, transform.rotation);
+        }
     }
 
 
@@ -93,10 +105,10 @@ public class MoveController : MonoBehaviour
             //AttackingZone側でも発生してから1f後に削除されるような仕様になっているが、複数ヒットしてしまうことがあるためこちらからもDestroy関数を呼ぶ
             Destroy(other.gameObject);
         }
-        else if (other.tag == "Enemy")
+        else if (other.tag == "PlayerHealing")
         {
             //Collider[] collide=other;
-            //Debug.Log("" + collide.GetValue());
+            Debug.Log("Healed" );
         }
     }
 
@@ -106,7 +118,8 @@ public class MoveController : MonoBehaviour
         Turn();
         Jumping();
         Attack();
-        isFireAttacking = fireSkill.CountInterval();
+        isFireAttacking = skill[0].CountInterval();
+        isHealing = skill[1].CountInterval();
     }
 
     private void Turn()
@@ -162,7 +175,8 @@ public class MoveController : MonoBehaviour
     private void LateUpdate()
     {
         //attackComponent.AttackMotionEnd("Attack");
-        fireSkill.StopAnimation("Fire");
+        skill[0].StopAnimation("Fire");
+        skill[1].StopAnimation("Heal");
     }
 
     public Vector3 GetPosition()
