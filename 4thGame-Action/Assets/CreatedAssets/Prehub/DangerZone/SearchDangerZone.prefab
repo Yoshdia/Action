@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5031538096387523443}
   - component: {fileID: 5031538096387523404}
   - component: {fileID: 5031538096387523405}
-  - component: {fileID: 5031538096387523441}
+  - component: {fileID: 1374129859977829995}
   m_Layer: 0
   m_Name: SearchDangerZone
   m_TagString: Untagged
@@ -92,7 +92,7 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &5031538096387523441
+--- !u!114 &1374129859977829995
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -101,10 +101,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 5031538096387523406}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 970009ceb314d34468a6df0ff249b2f5, type: 3}
+  m_Script: {fileID: 11500000, guid: 16738c6261238f945b0ff6bfc0769672, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  effects:
+  - plusPosition: {x: 0, y: 0, z: 0}
+    rotate: {x: 0, y: 0, z: 0}
+    effect: {fileID: 3136177852612277140, guid: bd9a9d73b6e10b748a7700dcf22eb017,
+      type: 3}
   waitingInterval: 100
   alfaSpeed: 0.01
-  bombEffect: {fileID: 7413508438657866072, guid: 3886ccc3d71952b4bbad57368a18ca8c,
-    type: 3}

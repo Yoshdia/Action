@@ -16,6 +16,7 @@ public class SkeltonController : MonoBehaviour
     Turn turnComponent;
     AttackAndAnimation attackComponent;
     EnemySkillPlace skillPlaceComponent;
+    DeadEnemy deadComponent;
 
 
     enum SkeltonState
@@ -52,8 +53,11 @@ public class SkeltonController : MonoBehaviour
     [SerializeField]
     float moveSpeedMax = 7.0f;
 
-    private EnemySkillBasic sphereSkill;
-    private EnemySkillBasic searchSkill;
+    [SerializeField]
+     GameObject sphereSkill;
+    [SerializeField]
+     GameObject searchSkill;
+    
 
     /// <summary>
     /// スキルチャージ中にSkeltonを中心に発生するエフェクト
@@ -85,6 +89,7 @@ public class SkeltonController : MonoBehaviour
         attackComponent = GetComponent<AttackAndAnimation>();
         animator = GetComponent<Animator>();
         skillPlaceComponent = GetComponent<EnemySkillPlace>();
+        deadComponent = GetComponent<DeadEnemy>();
     }
 
     // Start is called before the first frame update
@@ -94,8 +99,6 @@ public class SkeltonController : MonoBehaviour
         instantSkillEffect = null;
         myState = SkeltonState.AutoAttacking;
         skill = SkeltonSkill.Search;
-        sphereSkill = GetComponent<SphereSkill>();
-        searchSkill = GetComponent<SearchDanger>();
     }
 
     // Update is called once per frame
@@ -106,17 +109,16 @@ public class SkeltonController : MonoBehaviour
 
     private void FixedUpdate()
     {
-
-            if (myState == SkeltonState.AutoAttacking)
-            {
-                Move();
-                SkillChange();
-                Dead();
-            }
-            else
-            {
-                SkillPlace();
-            }
+        if (myState == SkeltonState.AutoAttacking)
+        {
+            Move();
+            SkillChange();
+            Dead();
+        }
+        else
+        {
+            SkillPlace();
+        }
     }
 
     void Move()
@@ -126,7 +128,7 @@ public class SkeltonController : MonoBehaviour
         {
             moveSpeed = moveSpeedMax;
         }
-        Vector3 targetPosition = target.GetTransform().position;
+        Vector3 targetPosition = target.GetPosition();
         float distance = Vector3.Distance(targetPosition, transform.position);
         if (distance > movingDistance)
         {
@@ -173,9 +175,9 @@ public class SkeltonController : MonoBehaviour
             instantSkillEffect = Instantiate(sphereSkillEffect, transform.position, effectQua);
             instantSkillEffect.transform.parent = transform;
 
-            EnemySkillBasic ShotSkill = null;
+            GameObject ShotSkill = null;
 
-            Transform targetTransform = transform;
+            Vector3 targetPosition = transform.position;
             switch (skill)
             {
                 case (SkeltonSkill.SphereExplosion):
@@ -183,14 +185,14 @@ public class SkeltonController : MonoBehaviour
                     break;
                 case (SkeltonSkill.Search):
                     ShotSkill = searchSkill;
-                    targetTransform = target.GetTransform();
+                    targetPosition = target.GetPosition();
                     break;
                 default:
                     ShotSkill = sphereSkill;
                     break;
             }
 
-            skillPlaceComponent.SkillPlace(SphereSkill.dangerTime, ShotSkill, targetTransform, "SkillChaging");
+            skillPlaceComponent.SkillPlace(ShotSkill, targetPosition, "SkillChaging");
         }
     }
 
@@ -215,20 +217,9 @@ public class SkeltonController : MonoBehaviour
         }
     }
 
-    float destroyCount = 300;
-
     void Dead()
     {
-        if (hitPoint > 0)
-        {
-            return;
-        }
-        animator.SetBool("Down", true);
-        destroyCount--;
-        if (destroyCount<0)
-        {
-            Destroy(transform.gameObject);
-        }
+        deadComponent.Dead(hitPoint, "Down");
     }
 
     private void OnTriggerEnter(Collider other)

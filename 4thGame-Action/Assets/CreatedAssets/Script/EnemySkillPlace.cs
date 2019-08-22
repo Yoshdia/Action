@@ -9,6 +9,8 @@ public class EnemySkillPlace : MonoBehaviour
     /// <summary>
     /// 動的に変化する、予兆発生からモーション再生までのインターバル
     /// </summary>
+    [SerializeField]
+    float skillDangerTimeMax=200;
     float skillDangerTime;
 
     private void Awake()
@@ -19,15 +21,16 @@ public class EnemySkillPlace : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        skillDangerTime= 0;
     }
 
 
-    public void SkillPlace(float skillDangerTimeMax,EnemySkillBasic skill,Transform targetTransform,System.String animationName)
+    public void SkillPlace(GameObject skill,Vector3 targetPosition,System.String animationName)
     {
         skillDangerTime = skillDangerTimeMax;
-        Transform target = targetTransform;
-        skill.SetSkillPrehub(targetTransform);
+        Vector3 target = targetPosition;
+        target.y += 0.1f;
+        Instantiate(skill, target, new Quaternion());
         animator.SetBool(animationName, true);
     }
 

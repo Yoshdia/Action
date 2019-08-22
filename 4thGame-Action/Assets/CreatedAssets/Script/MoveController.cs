@@ -12,6 +12,7 @@ public class MoveController : MonoBehaviour
     [SerializeField]
     BoxCollider weapon;
 
+
     /// <summary>
     ///カメラに基づいた移動方向 inputから受け取る
     /// </summary>
@@ -144,9 +145,9 @@ public class MoveController : MonoBehaviour
         //attackComponent.AttackMotionEnd("Attack");
     }
 
-    public Transform GetTransform()
+    public Vector3 GetPosition()
     {
-        return transform;
+        return transform.position;
     }
 
     public void AddDamage(float damage)

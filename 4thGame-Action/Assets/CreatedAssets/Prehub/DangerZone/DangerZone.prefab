@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 103173905397153936}
   - component: {fileID: 4931691067080448418}
   - component: {fileID: 447938466751916287}
-  - component: {fileID: 183482135558401125}
+  - component: {fileID: 7120951151162037606}
   m_Layer: 0
   m_Name: DangerZone
   m_TagString: Untagged
@@ -92,7 +92,7 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &183482135558401125
+--- !u!114 &7120951151162037606
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -101,12 +101,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 1471034404604331844}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 666606509ed329645b789cb6aa651b5c, type: 3}
+  m_Script: {fileID: 11500000, guid: 16738c6261238f945b0ff6bfc0769672, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  effects:
+  - plusPosition: {x: 0, y: 0, z: 0}
+    rotate: {x: 0, y: 0, z: 0}
+    effect: {fileID: 4644778294020724409, guid: 08ec4a84b8901fe4c8bef9af96d11f28,
+      type: 3}
+  - plusPosition: {x: 0, y: 10, z: 0}
+    rotate: {x: 90, y: 0, z: 0}
+    effect: {fileID: 7023782093216410939, guid: bfadf9c91ac7dd545beb8031fdd568b2,
+      type: 3}
   waitingInterval: 100
   alfaSpeed: 0.01
-  fallEffect: {fileID: 7023782093216410939, guid: bfadf9c91ac7dd545beb8031fdd568b2,
-    type: 3}
-  explosionEffect: {fileID: 4644778294020724409, guid: 08ec4a84b8901fe4c8bef9af96d11f28,
-    type: 3}
