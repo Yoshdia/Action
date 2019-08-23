@@ -11,6 +11,7 @@ public class InputController : MonoBehaviour
   bool inputAttack = false;
     float inputFire = 0;
     float inputHeal = 0;
+    float inputStrong = 0;
     
 
     //カメラから見てどの方向に移動するかのベクトル
@@ -24,6 +25,7 @@ public class InputController : MonoBehaviour
         inputFire = Input.GetAxis("Fire");
         inputHeal = Input.GetAxis("Heal");
         inputAttack = Input.GetMouseButtonDown(0)||Input.GetKey(KeyCode.Alpha0);
+        inputStrong = Input.GetAxis("Strong");
     }
 
     // Update is called once per frame
@@ -94,5 +96,9 @@ public class InputController : MonoBehaviour
     public float HasHealInput()
     {
         return inputHeal;
+    }
+    public float HasStrongInput()
+    {
+        return inputStrong;
     }
 }

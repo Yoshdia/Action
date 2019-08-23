@@ -12,6 +12,15 @@ public class MoveController : MonoBehaviour
     [SerializeField]
     BoxCollider weapon;
 
+    enum PlayerState
+    {
+        Moving,
+        Strong,
+        Died,
+    }
+
+    PlayerState playerState;
+
     /// <summary>
     ///カメラに基づいた移動方向 inputから受け取る
     /// </summary>
@@ -31,6 +40,8 @@ public class MoveController : MonoBehaviour
     bool isFireAttacking;
 
     bool isHealing;
+
+    bool isStrong;
 
     int comboCount;
 
@@ -58,6 +69,8 @@ public class MoveController : MonoBehaviour
         comboCount = 0;
         isFireAttacking = false;
         isHealing = false;
+        isStrong = false;
+        playerState = PlayerState.Moving;
     }
 
 
@@ -65,34 +78,44 @@ public class MoveController : MonoBehaviour
     {
         inputMovement = input.GetMovement();
 
-        if (input.HasJumpInput() > 0 && notJumping)
+        if (!isStrong)
         {
-            notJumping = false;
-            animator.SetBool("Jump", true);
-            jumpComponent.Jump();
+            if (input.HasJumpInput() > 0 && notJumping)
+            {
+                notJumping = false;
+                animator.SetBool("Jump", true);
+                jumpComponent.Jump();
+            }
+
+            if (input.HasAttackInput() && !isAttacking && !isFireAttacking)
+            {
+                isAttacking = true;
+                attackComponent.AttackAndIntervalReset("Attack1");
+                weapon.enabled = true;
+                comboCount++;
+            }
+
+            if (input.HasFireInput() > 0 && !isFireAttacking && !isAttacking)
+            {
+                isFireAttacking = true;
+                skill[0].Shot("Fire", transform);
+                Instantiate(skillEffect, transform.position, transform.rotation);
+            }
+
+            if (input.HasHealInput() > 0 && !isHealing)
+            {
+                isHealing = true;
+                skill[1].Shot("Heal", transform);
+                Instantiate(skillEffect, transform.position, transform.rotation);
+            }
+
+            if (input.HasStrongInput() > 0 && !isHealing && !isFireAttacking)
+            {
+                isStrong = true;
+                animator.SetBool("StrongAttack", true);
+            }
         }
 
-        if (input.HasAttackInput() && !isAttacking && !isFireAttacking)
-        {
-            isAttacking = true;
-            attackComponent.AttackAndIntervalReset("Attack1");
-            weapon.enabled = true;
-            comboCount++;
-        }
-
-        if (input.HasFireInput() > 0 && !isFireAttacking && !isAttacking)
-        {
-            isFireAttacking = true;
-            skill[0].Shot("Fire", transform);
-            Instantiate(skillEffect, transform.position, transform.rotation);
-        }
-
-        if(input.HasHealInput()>0&&!isHealing)
-        {
-            isHealing = true;
-            skill[1].Shot("Heal", transform);
-            Instantiate(skillEffect, transform.position, transform.rotation);
-        }
     }
 
 
@@ -108,7 +131,7 @@ public class MoveController : MonoBehaviour
         else if (other.tag == "PlayerHealing")
         {
             //Collider[] collide=other;
-            Debug.Log("Healed" );
+            Debug.Log("Healed");
         }
     }
 
@@ -177,6 +200,7 @@ public class MoveController : MonoBehaviour
         //attackComponent.AttackMotionEnd("Attack");
         skill[0].StopAnimation("Fire");
         skill[1].StopAnimation("Heal");
+        animator.SetBool("StrongAttack", false);
     }
 
     public Vector3 GetPosition()
